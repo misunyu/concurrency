@@ -1,0 +1,441 @@
+<html>
+
+<head>
+<meta name=Title content="">
+<meta name=Keywords content="">
+<meta http-equiv=Content-Type content="text/html; charset=ks_c_5601-1987">
+<meta name=Generator content="Microsoft Word 15 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:"Courier New";
+	panose-1:2 7 3 9 2 2 5 2 4 4;}
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:"맑은 고딕";}
+@font-face
+	{font-family:"\@맑은 고딕";}
+@font-face
+	{font-family:굴림체;}
+@font-face
+	{font-family:"\@굴림체";}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:0cm;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+p.MsoHeader, li.MsoHeader, div.MsoHeader
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:0cm;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	layout-grid-mode:char;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:0cm;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	layout-grid-mode:char;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+a:link, span.MsoHyperlink
+	{color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:#954F72;
+	text-decoration:underline;}
+pre
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:굴림체;}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:40.0pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+span.HTMLPreformattedChar
+	{font-family:굴림체;}
+.MsoChpDefault
+	{font-size:10.0pt;
+	font-family:"맑은 고딕";}
+.MsoPapDefault
+	{margin-bottom:8.0pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;}
+ /* Page Definitions */
+@page WordSection1
+	{size:595.3pt 841.9pt;
+	margin:36.0pt 36.0pt 36.0pt 36.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+ /* List Definitions */
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=KO link="#0563C1" vlink="#954F72">
+
+<div class=WordSection1>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><b><span lang=EN-US>SUMMARY</span></b></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>A concurrency bug in NSS-Libraries 3.4</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><b><span lang=EN-US>DETAILS</span></b></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>Some details can also be found at: https://bugzilla.mozilla.org/show_bug.cgi?id=341323</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>This bug is due to a data race. </span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>There is a race condition in that code.
+NSSCryptoContext_ImportCertificate is a no-op if the cert already exists in the
+context's cert store. It just checks the content of the hash table, without
+incrementing any refcount or returning any object.</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>So, when we get to the next line, the
+NSSCryptoContext_FindCertificateByIssuerAndSerialNumber call, it's possible for
+the cert to have been removed from the context by another thread.</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 width=517
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=248 valign=top style='width:247.85pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US>Thread1 (stanpcertdb.c)</span></p>
+  </td>
+  <td width=269 valign=top style='width:269.3pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US>Thread2 (stanpcertdb.c)</span></p>
+  </td>
+ </tr>
+ <tr style='height:91.85pt'>
+  <td width=248 valign=top style='width:247.85pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New";
+  color:#0070C0'>nssrv = NSSCryptoContext_ImportCertificate(gCC, c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (nssrv != PR_SUCCESS) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto
+  loser;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* so find the entry in the temp store */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  tempCert = NSSCryptoContext_FindCertificateByIssuerAndSerialNumber(gCC<span
+  style='color:#0070C0'>,&amp;c-&gt;issuer,&amp;c-&gt;serial</span>);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* destroy the copy */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  NSSCertificate_Destroy(c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (tempCert) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /*
+  and use the &quot;official&quot; entry */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c
+  = tempCert;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp; cc = STAN_GetCERTCertificateOrRelease(c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  if (!cc) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  return NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  } else {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return
+  NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  </td>
+  <td width=269 valign=top style='width:269.3pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>nssrv
+  = NSSCryptoContext_ImportCertificate(gCC, c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (nssrv != PR_SUCCESS) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto
+  loser;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;/* so find the entry in the temp store */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  tempCert = NSSCryptoContext_FindCertificateByIssuerAndSerialNumber(gCC,&amp;c-&gt;issuer,&amp;c-&gt;serial);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* destroy the copy */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New";
+  color:#0070C0'>&nbsp;&nbsp;&nbsp; NSSCertificate_Destroy(c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (tempCert) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /*
+  and use the &quot;official&quot; entry */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c
+  = tempCert;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp; cc = STAN_GetCERTCertificateOrRelease(c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  if (!cc) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  return NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  } else {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return
+  NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  </td>
+ </tr>
+ <tr style='height:91.85pt'>
+  <td width=248 valign=top style='width:247.85pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>(cryptocontext.c)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>NSS_IMPLEMENT
+  PRStatus</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>NSSCryptoContext_ImportCertificate
+  (</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+  NSSCryptoContext *cc,</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+  NSSCertificate *c</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>{</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  PRStatus nssrv;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (!cc-&gt;certStore) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cc-&gt;certStore
+  = nssCertificateStore_Create(cc-&gt;arena);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if
+  (!cc-&gt;certStore) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+  return PR_FAILURE;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  nssrv = nssCertificateStore_Add(cc-&gt;certStore, c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (nssrv == PR_SUCCESS) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+  style='color:#0070C0'>c-&gt;object.cryptoContext = cc;</span></span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  return nssrv;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>}</span></p>
+  </td>
+  <td width=269 valign=top style='width:269.3pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr style='height:91.85pt'>
+  <td width=248 valign=top style='width:247.85pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  </td>
+  <td width=269 valign=top style='width:269.3pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr style='height:2.9pt'>
+  <td width=248 valign=top style='width:247.85pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:2.9pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:9.0pt;font-family:"Courier New"'>0-lock</span></p>
+  </td>
+  <td width=269 valign=top style='width:269.3pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:2.9pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:9.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+</body>
+
+</html>

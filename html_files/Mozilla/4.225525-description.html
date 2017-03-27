@@ -1,0 +1,304 @@
+<html>
+
+<head>
+<meta name=Title content="">
+<meta name=Keywords content="">
+<meta http-equiv=Content-Type content="text/html; charset=ks_c_5601-1987">
+<meta name=Generator content="Microsoft Word 15 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:"Courier New";
+	panose-1:2 7 3 9 2 2 5 2 4 4;}
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:"맑은 고딕";}
+@font-face
+	{font-family:"\@맑은 고딕";}
+@font-face
+	{font-family:굴림체;}
+@font-face
+	{font-family:"\@굴림체";}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:0cm;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+a:link, span.MsoHyperlink
+	{color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:#954F72;
+	text-decoration:underline;}
+pre
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:굴림체;}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:40.0pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+span.HTMLPreformattedChar
+	{font-family:굴림체;}
+.MsoChpDefault
+	{font-size:10.0pt;
+	font-family:"맑은 고딕";}
+.MsoPapDefault
+	{margin-bottom:8.0pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;}
+ /* Page Definitions */
+@page WordSection1
+	{size:595.3pt 841.9pt;
+	margin:36.0pt 36.0pt 36.0pt 36.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+ /* List Definitions */
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=KO link="#0563C1" vlink="#954F72">
+
+<div class=WordSection1>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><b><span lang=EN-US>SUMMARY</span></b></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>A concurrency bug in NSS-Libraries 3.8</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><b><span lang=EN-US>DETAILS</span></b></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>Some details can also be found at: https://bugzilla.mozilla.org/show_bug.cgi?id=225525</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>This bug is due to a data race. </span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>The NSSCertificate structure has a member named
+&quot;decoding&quot;, which points to an nssDecodedCert structure.&nbsp; There
+are several places in NSS that assign a value to this member (e.g.
+c-&gt;decoding).&nbsp; Typical code looks like</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;&nbsp;&nbsp; if (!c-&gt;decoding) </span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+c-&gt;decoding = somefunction(some,arguments);</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>Such code is found in pki/certificate.c,
+pki/pki3hack.c, pki/pkibase.c </span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>None of these places uses a lock or other mutual
+exclusion device to make the test and the update atomic.</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>Multiple threads can find c-&gt;decoding to be NULL,
+and then get pre-empted right after the test. Only one of the threads will get
+to do the assignment. The other threads will still leak their object when they
+resume and overwrite the first copy.</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 width=531
+ style='width:531.35pt;border-collapse:collapse;border:none'>
+ <tr>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US>Thread1 (certificate.c)</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US>Thread2 (certificate.c)</span></p>
+  </td>
+ </tr>
+ <tr style='height:91.85pt'>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>NSS_IMPLEMENT
+  nssDecodedCert *</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>nssCertificate_GetDecoding
+  (</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+  NSSCertificate *c</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>{</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  nssDecodedCert* deco = NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (c-&gt;type == NSSCertificateType_PKIX) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  (void)STAN_GetCERTCertificate(c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  nssPKIObject_Lock(&amp;c-&gt;object);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if <span style='color:#0070C0'>(!c-&gt;decoding</span>) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; deco
+  = nssDecodedCert_Create(NULL, &amp;c-&gt;encoding, c-&gt;type);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp; PORT_Assert(!c-&gt;decoding); </span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  c-&gt;decoding = deco;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  } else {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  deco = c-&gt;decoding;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>NSS_IMPLEMENT nssDecodedCert *</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>nssCertificate_GetDecoding (</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp; NSSCertificate *c</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>{</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; nssDecodedCert* deco = NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; if (c-&gt;type == NSSCertificateType_PKIX)
+  {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  (void)STAN_GetCERTCertificate(c);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; nssPKIObject_Lock(&amp;c-&gt;object);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; if (!c-&gt;decoding) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; deco =
+  nssDecodedCert_Create(NULL, &amp;c-&gt;encoding, c-&gt;type);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; PORT_Assert(!c-&gt;decoding); </span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+  style='color:#0070C0'>c-&gt;decoding = deco;</span></span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; } else {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; deco =
+  c-&gt;decoding;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;text-indent:
+  8.4pt;line-height:normal'><span lang=EN-US style='font-size:8.0pt;font-family:
+  "Courier New"'>&nbsp;&nbsp;&nbsp; }</span></p>
+  </td>
+ </tr>
+ <tr style='height:2.9pt'>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:2.9pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:9.0pt;font-family:"Courier New"'>0-lock</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:2.9pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:9.0pt;font-family:"Courier New"'>0-lock</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+</body>
+
+</html>

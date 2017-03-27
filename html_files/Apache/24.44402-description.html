@@ -1,0 +1,512 @@
+<html>
+
+<head>
+<meta name=Title content="">
+<meta name=Keywords content="">
+<meta http-equiv=Content-Type content="text/html; charset=ks_c_5601-1987">
+<meta name=Generator content="Microsoft Word 15 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:"Courier New";
+	panose-1:2 7 3 9 2 2 5 2 4 4;}
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:바탕;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:"맑은 고딕";}
+@font-face
+	{font-family:"\@맑은 고딕";}
+@font-face
+	{font-family:"\@바탕";}
+@font-face
+	{font-family:굴림체;}
+@font-face
+	{font-family:"\@굴림체";}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:0cm;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+a:link, span.MsoHyperlink
+	{color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:#954F72;
+	text-decoration:underline;}
+pre
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:굴림체;}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:40.0pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;
+	text-autospace:none;
+	word-break:break-hangul;
+	font-size:10.0pt;
+	font-family:"맑은 고딕";}
+span.HTMLPreformattedChar
+	{font-family:굴림체;}
+.MsoChpDefault
+	{font-size:10.0pt;
+	font-family:"맑은 고딕";}
+.MsoPapDefault
+	{margin-bottom:8.0pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	line-height:107%;}
+ /* Page Definitions */
+@page WordSection1
+	{size:595.3pt 841.9pt;
+	margin:36.0pt 36.0pt 36.0pt 36.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+ /* List Definitions */
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=KO link="#0563C1" vlink="#954F72">
+
+<div class=WordSection1>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><b><span lang=EN-US>SUMMARY</span></b></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>A concurrency bug in Apache httpd-2 2.2.6.</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><b><span lang=EN-US>DETAILS</span></b></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>Some details can also be found at: </span><u><span
+lang=EN-US style='font-family:Calibri;color:#4600A5'>https://bz.apache.org/bugzilla/show_bug.cgi?id=44402</span></u></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>This bug is due to a data race. </span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 width=531
+ style='width:531.35pt;border-collapse:collapse;border:none'>
+ <tr>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US>Thread1 (fdqueue.c)</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US>Thread2 (worker.c)</span></p>
+  </td>
+ </tr>
+ <tr style='height:91.85pt'>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  </span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>apr_status_t
+  ap_queue_info_set_idle(fd_queue_info_t *queue_info,</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  apr_pool_t *pool_to_recycle)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>{</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:바탕'>..</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  for (;;) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  new_recycle-&gt;next = queue_info-&gt;recycled_pools;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  if (apr_atomic_casptr((volatile void**)&amp;(queue_info-&gt;recycled_pools),</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  new_recycle, <span style='color:blue'>new_recycle-&gt;next</span>) ==</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <span style='color:blue'>new_recycle-&gt;next</span>) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  break;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>static
+  void * APR_THREAD_FUNC worker_thread(apr_thread_t *thd, void * dummy)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>{</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>..</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  apr_pool_clear(ptrans);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  last_ptrans = ptrans;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:바탕'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:바탕'>//</span><span
+  lang=EN-US> </span><span lang=EN-US style='font-size:8.0pt;font-family:바탕'>new_recycle-&gt;next
+  will be corrupted and point to a deleted value.</span></p>
+  </td>
+ </tr>
+ <tr style='height:91.85pt'>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>APR_DECLARE(void)
+  apr_pool_clear(apr_pool_t *pool)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>{</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  apr_memnode_t *active;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* Destroy the subpools.&nbsp; The subpools will detach themselves from</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;
+  * this pool thus this loop is safe and easy.</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;
+  */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  while (pool-&gt;child)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  apr_pool_destroy(pool-&gt;child);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* Run cleanups */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  run_cleanups(&amp;pool-&gt;cleanups);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  pool-&gt;cleanups = NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  pool-&gt;free_cleanups = NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* Free subprocesses */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  free_proc_chain(pool-&gt;subprocesses);</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  pool-&gt;subprocesses = NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* Clear the user data. */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  pool-&gt;user_data = NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  /* Find the node attached to the pool structure, reset it, make</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;
+  * it the active node and free the rest of the nodes.</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;
+  */</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  active = pool-&gt;active = pool-&gt;self;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  active-&gt;first_avail = pool-&gt;self_first_avail;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  if (active-&gt;next == active)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  return;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  *active-&gt;ref = NULL;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  <span style='color:blue'>allocator_free(pool-&gt;allocator, active-&gt;next);</span></span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  active-&gt;next = active;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  active-&gt;ref = &amp;active-&gt;next;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>}</span></p>
+  </td>
+ </tr>
+ <tr style='height:91.85pt'>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:91.85pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>static
+  APR_INLINE</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>void
+  allocator_free(apr_allocator_t *allocator, apr_memnode_t *node)</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>{</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>..</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  while (freelist != NULL) {</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  node = freelist;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  freelist = node-&gt;next;</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <span style='color:blue'>free(node);</span></span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;
+  }</span></p>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>}</span></p>
+  </td>
+ </tr>
+ <tr style='height:2.9pt'>
+  <td width=269 valign=top style='width:269.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:2.9pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:9.0pt;font-family:"Courier New"'>0-lock</span></p>
+  </td>
+  <td width=262 valign=top style='width:262.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:2.9pt'>
+  <p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+  normal'><span lang=EN-US style='font-size:9.0pt;font-family:"Courier New"'>0-lock</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>Crash
+1 :</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>(dbx)
+where</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>current
+thread: t@76</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>=&gt;[1]
+allocator_free(allocator = 0x101f870, node = (nil)), line 331 in
+&quot;apr_pools.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[2] apr_pool_clear(pool = 0x102fb88), line 710 in &quot;apr_pools.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[3] ap_core_output_filter(f = 0x1020550, b = 0x101f9e8), line 899 in</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&quot;core_filters.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[4] ap_pass_brigade(next = 0x1020550, bb = 0x101f9e8), line 526 in
+&quot;util_filter.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[5] logio_out_filter(f = 0x10204e0, bb = 0x101f9e8), line 135 in
+&quot;mod_logio.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[6] ap_pass_brigade(next = 0x10204e0, bb = 0x101f9e8), line 526 in
+&quot;util_filter.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[7] ap_flush_conn(c = 0x101fd00), line 84 in &quot;connection.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[8] ap_lingering_close(c = 0x101fd00), line 123 in &quot;connection.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[9] process_socket(p = 0x101f968, sock = 0x101f9e8, my_child_num = 1,</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>my_thread_num
+= 227, bucket_alloc = 0x1029a88), line 545 in &quot;worker.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[10] worker_thread(thd = 0x5bed38, dummy = 0x6dbac0), line 894 in
+&quot;worker.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[11] dummy_worker(opaque = 0x5bed38), line 142 in &quot;thread.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[12] _thr_setup(0x0, 0x0, 0x0, 0x0, 0x0, 0x0), at 0xfffffd7ffef5d8f7</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[13] _lwp_start(0x0, 0x0, 0x0, 0x0, 0x0, 0x0), at 0xfffffd7ffef5dba0</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>Crash
+2 :</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>(dbx)
+where</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>current
+thread: t@363</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>=&gt;[1]
+apr_palloc(pool = 0x21680007952225ff, size = 18446744073323675656U), line</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>601
+in &quot;apr_pools.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[2] apr_sockaddr_ip_get(addr = 0xcda3d0, sockaddr = 0x42d790), line 104 in</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&quot;sockaddr.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[3] core_create_conn(ptrans = 0xcda2d8, server = 0x4bf600, csd = 0xcda358, id</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>=
+360, sbh = 0xcda378, alloc = 0xd147e8), line 3895 in &quot;core.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[4] ap_run_create_connection(0x0, 0x0, 0x0, 0x0, 0x0, 0x0), at 0x45fe03</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[5] process_socket(p = 0xcda2d8, sock = 0xcda358, my_child_num = 0,</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>my_thread_num
+= 360, bucket_alloc = 0xd147e8), line 542 in &quot;worker.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[6] worker_thread(thd = 0x7192f8, dummy = 0x7e45a0), line 894 in
+&quot;worker.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[7] dummy_worker(opaque = 0x7192f8), line 142 in &quot;thread.c&quot;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[8] _thr_setup(0x0, 0x0, 0x0, 0x0, 0x0, 0x0), at 0xfffffd7ffef5d8f7</span></p>
+
+<p class=MsoNormal style='margin-bottom:0cm;margin-bottom:.0001pt;line-height:
+normal'><span lang=EN-US style='font-size:8.0pt;font-family:"Courier New"'>&nbsp;
+[9] _lwp_start(0x0, 0x0, 0x0, 0x0, 0x0, 0x0), at 0xfffffd7ffef5dba0</span></p>
+
+</div>
+
+</body>
+
+</html>
